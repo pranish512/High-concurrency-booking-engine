@@ -1,0 +1,28 @@
+# Optional container setup: API (SQLite on a volume) + Redis.
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports: ["6379:6379"]
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 30
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: sqlite+aiosqlite:////srv/data/booking.db
+      REDIS_URL: redis://redis:6379/0
+      WEBHOOK_SECRET: dev-webhook-secret
+      TZ: Asia/Kolkata           # show times are theatre-local
+      WEB_CONCURRENCY: 2         # uvicorn worker processes (each has one SQLite writer)
+    ports: ["8000:8000"]
+    volumes: [sqlite-data:/srv/data]
+    depends_on:
+      redis: { condition: service_healthy }
+
+volumes:
+  redis-data:
+  sqlite-data:

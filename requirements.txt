@@ -1,0 +1,10 @@
+fastapi>=0.115
+uvicorn>=0.30
+sqlalchemy[asyncio]>=2.0.36
+aiosqlite>=0.20
+redis>=5.2
+pydantic-settings>=2.6
+httpx>=0.27               # scripts/check_api.py
+# Optional, only for DATABASE_URL=mysql+aiomysql://...
+aiomysql>=0.2
+cryptography>=43
